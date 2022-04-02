@@ -1,0 +1,11 @@
+{
+  "type": "unity",
+  "course": "dig3480",
+  "assignment": "Ruby's New Adventure",
+  "term": "sb21",
+  "section": "bw61",
+  "slug": "dig3480-sb21-t4-rubys_new_adventure",
+  "gaim.vsix": "0.0.60",
+  "gaim.unity": "0.0.9",
+  "curBranch": "main"
+}
