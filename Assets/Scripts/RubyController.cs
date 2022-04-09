@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 ﻿public class RubyController : MonoBehaviour
 {
@@ -24,11 +27,30 @@ using UnityEngine;
     Animator animator;
     Vector2 lookDirection = new Vector2(1,0);
 
-    AudioSource audioSource;
+    public AudioSource audioSource;
     public AudioClip throwSound;
     public AudioClip hitSound;
+    public AudioClip WinSong;
+    public AudioClip GameOver;
 
-    public ParticleSystem hitEffect;
+    public ParticleSystem healthEffectPrefab;
+    public ParticleSystem hitEffectPrefab;
+
+    public Text score;
+    private int scoreValue;
+    public GameObject WinTextObject;
+    public GameObject LoseTextObject;
+
+    public bool IsAlive;
+    public GameObject Level1OverText;
+
+    public bool gameOver = false;
+    public bool level1;
+
+    public Text Cogs;
+    public int Ammo;
+    public AudioClip collectedClip;
+    
     
     // Start is called before the first frame update
     void Start()
@@ -37,7 +59,29 @@ using UnityEngine;
         animator = GetComponent<Animator>();
         currentHealth = maxHealth;
 
-        audioSource= GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
+        score.text = scoreValue.ToString();
+
+        WinTextObject.SetActive(false);
+        LoseTextObject.SetActive(false);
+        Level1OverText.SetActive(false);
+        IsAlive = true;
+        
+
+        SetCogsText();
+        Cogs.text = "Cogs: " + Ammo.ToString();
+        Ammo = 4;
+
+        level1 = true;
+        GameObject Jambi = GameObject.FindWithTag("Jambi");
+        if(Jambi != null)
+        {
+            level1 = true;
+        }
+        if (Jambi == null)
+        {
+            level1 = false;
+        }
     }
 
     // Update is called once per frame
@@ -82,13 +126,54 @@ using UnityEngine;
             if (hit.collider != null)
             {
                 NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
+                if (character != null && scoreValue == 4)
+                {
+                     SceneManager.LoadScene("Main 1");
+                }
+
                 if (character != null)
                 {
                     character.DisplayDialog();
                 }
             }
         }
+        score.text = "Robots Fixed: " + scoreValue.ToString();
+
+        if (currentHealth == 0)
+        {
+            LoseTextObject.SetActive(true);
+            speed = 0.0f;
+            isInvincible = true;
+            if (currentHealth == 0)
+            if (Input.GetKey(KeyCode.R))
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                 // this loads the currently active scene
+            }
+        }
+        if (currentHealth == 0 && IsAlive)
+        {
+            IsAlive = false;
+            GameObject.Find("BackgroundMusic").GetComponent<AudioSource>().mute = true;
+            audioSource.clip = GameOver;
+                audioSource.Play();
+            audioSource.loop = false;
+        
+        }
+        if (scoreValue == 4 && level1 == false)
+        {
+            isInvincible = true;
+            WinTextObject.SetActive(true);
+
+             if (Input.GetKey(KeyCode.R))
+            {
+                SceneManager.LoadScene("Main");
+                 // this loads the currently active scene
+            }
+        }
+
     }
+
     void FixedUpdate()
     {
         Vector2 position = rigidbody2d.position;
@@ -109,16 +194,67 @@ using UnityEngine;
             invincibleTimer = timeInvincible;
             animator.SetTrigger("Hit");
             PlaySound(hitSound);
-            Instantiate(hitEffect);
+            ParticleSystem hitEffect= Instantiate(hitEffectPrefab, rigidbody2d.position + Vector2.up * 1.5f, Quaternion.identity);    
         }
         
+        if (amount > 0)
+        {
+            ParticleSystem healthEffect= Instantiate(healthEffectPrefab, rigidbody2d.position + Vector2.up * 1.5f, Quaternion.identity);
+        }
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         
         UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
     }
+
+    public void ChangeScore()
+    {
+        scoreValue += 1;
+        score.text = "Robots Fixed: " + score.ToString();
+
+        if (scoreValue == 4 && level1 == false)
+        {
+             GameObject.Find("BackgroundMusic").GetComponent<AudioSource>().mute = true;
+         
+            audioSource.clip = WinSong;
+                audioSource.Play();
+            audioSource.loop = false;
+            WinTextObject.SetActive(true);
+            isInvincible = true;
+
+             if (Input.GetKey(KeyCode.R))
+            {
+                SceneManager.LoadScene("Main");
+                 // this loads the currently active scene
+            }
+        }
+
+        if (scoreValue == 4 && level1 == true)
+        {
+            Level1OverText.SetActive(true);
+        }
+    }
+
+    void SetCogsText()
+        {
+            Cogs.text = "Cogs: " + Ammo.ToString();
+        }
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+
+        if(other.gameObject.CompareTag("Ammo") && Ammo < 4)
+        {
+            other.gameObject.SetActive(false);
+            Ammo = Ammo + 4;
+            Cogs.text = "Cogs: " + Ammo.ToString();
+            ParticleSystem healthEffect= Instantiate(healthEffectPrefab, rigidbody2d.position + Vector2.up * 1.5f, Quaternion.identity);
+            PlaySound(collectedClip);
+        }
+    }
     
     void Launch()
     {
+        if (Ammo > 0)
+        {
         GameObject projectileObject = Instantiate(projectilePrefab, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
 
         Projectile projectile = projectileObject.GetComponent<Projectile>();
@@ -127,11 +263,13 @@ using UnityEngine;
         animator.SetTrigger("Launch");
 
         PlaySound(throwSound);
+        Ammo = Ammo - 1;
+        Cogs.text = "Cogs: " + Ammo.ToString();
+        }
     }
 
     public void PlaySound(AudioClip clip)
     {
         audioSource.PlayOneShot(clip);
     }
-
 }

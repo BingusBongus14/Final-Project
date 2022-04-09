@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class HardEnemyController : MonoBehaviour
 {
     public float speed;
     public bool vertical;
@@ -18,14 +18,13 @@ public class EnemyController : MonoBehaviour
     Animator animator;
     
     public RubyController RubyController;
-
     // Start is called before the first frame update
     void Start()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
         timer = changeTime;
         animator = GetComponent<Animator>();
-        
+
         GameObject rubycontrollerObject = GameObject.FindWithTag("RubyController");
 
         if(rubycontrollerObject != null)
@@ -37,6 +36,7 @@ public class EnemyController : MonoBehaviour
         {
             print ("Cannot find GameController Script!");
         }
+        
     }
 
     void Update()
@@ -87,7 +87,7 @@ public class EnemyController : MonoBehaviour
 
         if (player != null)
         {
-            player.ChangeHealth(-1);
+            player.ChangeHealth(-2);
         }
     }
     
@@ -96,7 +96,9 @@ public class EnemyController : MonoBehaviour
     {
         broken = false;
         rigidbody2D.simulated = false;
+        //optional if you added the fixed animation
         animator.SetTrigger("Fixed");
+        
         smokeEffect.Stop();
 
         if (RubyController != null)
