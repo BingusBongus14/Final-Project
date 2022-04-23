@@ -533,7 +533,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 421703281}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.6236153, y: -4.6243496, z: -10}
+  m_LocalPosition: {x: -2.790948, y: -4.6243486, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 680612607}
@@ -11244,8 +11244,23 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 075149d01c60a9a46ae6a3fa99992044, type: 3}
     - target: {fileID: 722079917238709227, guid: 1a7998d8692656a46a46375824388938,
         type: 3}
+      propertyPath: dashSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 722079917238709227, guid: 1a7998d8692656a46a46375824388938,
+        type: 3}
+      propertyPath: dashnoise
+      value: 
+      objectReference: {fileID: 8300000, guid: 18188a1593f4e9149af2d4f5f5b808db, type: 3}
+    - target: {fileID: 722079917238709227, guid: 1a7998d8692656a46a46375824388938,
+        type: 3}
       propertyPath: maxHealth
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 722079917238709227, guid: 1a7998d8692656a46a46375824388938,
+        type: 3}
+      propertyPath: dashLength
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 722079917238709227, guid: 1a7998d8692656a46a46375824388938,
         type: 3}

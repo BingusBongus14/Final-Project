@@ -7,11 +7,13 @@ using UnityEngine.SceneManagement;
 
 ﻿public class RubyController : MonoBehaviour
 {
-    public float speed = 3.0f;
+    public float speed = 3f;
     
     public int maxHealth = 5;
     
     public GameObject projectilePrefab;
+    public GameObject bossPrefab;
+    private Vector2 pos;
     
     public int health { get { return currentHealth; }}
     int currentHealth;
@@ -50,11 +52,21 @@ using UnityEngine.SceneManagement;
     public Text Cogs;
     public int Ammo;
     public AudioClip collectedClip;
+
+    private float activeMoveSpeed;
+    public float dashSpeed;
+    public float dashLength = .5f, dashCooldown = 1f;
+    private float dashCounter;
+    private float dashCoolCounter;
+    public AudioClip dashnoise;
+    public TrailRenderer dashtrail;
     
     
     // Start is called before the first frame update
     void Start()
     {
+        dashtrail.enabled = false;
+        activeMoveSpeed = speed;
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         currentHealth = maxHealth;
@@ -108,6 +120,36 @@ using UnityEngine.SceneManagement;
         animator.SetFloat("Look Y", lookDirection.y);
         animator.SetFloat("Speed", move.magnitude);
         
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(dashCoolCounter <= 0 && dashCounter <= 0 && move.magnitude != 0)
+            {
+                activeMoveSpeed = dashSpeed;
+                dashCounter = dashLength;
+                audioSource.clip = dashnoise;
+                    audioSource.Play();
+                audioSource.loop = false;
+                dashtrail.enabled = true;
+            }
+        }
+
+        if (dashCounter > 0)
+        {
+            dashCounter -= Time.deltaTime;
+
+            if( dashCounter <= 0)
+            {
+                activeMoveSpeed = speed;
+                dashCoolCounter = dashCooldown;
+                dashtrail.enabled = false;
+            }
+        }
+
+        if (dashCoolCounter > 0)
+        {
+            dashCoolCounter -= Time.deltaTime;
+        }
+
         if (isInvincible)
         {
             invincibleTimer -= Time.deltaTime;
@@ -160,7 +202,7 @@ using UnityEngine.SceneManagement;
             audioSource.loop = false;
         
         }
-        if (scoreValue == 4 && level1 == false)
+        if (scoreValue == 5 && level1 == false)
         {
             isInvincible = true;
             WinTextObject.SetActive(true);
@@ -177,8 +219,8 @@ using UnityEngine.SceneManagement;
     void FixedUpdate()
     {
         Vector2 position = rigidbody2d.position;
-        position.x = position.x + speed * horizontal * Time.deltaTime;
-        position.y = position.y + speed * vertical * Time.deltaTime;
+        position.x = position.x + activeMoveSpeed * horizontal * Time.deltaTime;
+        position.y = position.y + activeMoveSpeed * vertical * Time.deltaTime;
 
         rigidbody2d.MovePosition(position);
     }
@@ -212,6 +254,12 @@ using UnityEngine.SceneManagement;
         score.text = "Robots Fixed: " + score.ToString();
 
         if (scoreValue == 4 && level1 == false)
+        {
+            pos = new Vector2(3f,1.63f);
+            GameObject bossObject = Instantiate(bossPrefab, pos, Quaternion.identity);
+        }
+        
+        if (scoreValue == 5 && level1 == false)
         {
              GameObject.Find("BackgroundMusic").GetComponent<AudioSource>().mute = true;
          
@@ -272,4 +320,5 @@ using UnityEngine.SceneManagement;
     {
         audioSource.PlayOneShot(clip);
     }
+        
 }

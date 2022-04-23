@@ -5,6 +5,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     Rigidbody2D rigidbody2d;
+    public BossController BossController;
     
     void Awake()
     {
@@ -35,6 +36,11 @@ public class Projectile : MonoBehaviour
         if (p != null)
         {
             p.Fix();
+        }
+        BossController g = other.collider.GetComponent<BossController>();
+        if (g != null)
+        {
+            g.ChangeHealth(-1);
         }
     
         Destroy(gameObject);
