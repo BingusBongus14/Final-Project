@@ -10,13 +10,15 @@ public class EnemyController : MonoBehaviour
 
     public ParticleSystem smokeEffect;
     
-    Rigidbody2D rigidbody2D;
+    new Rigidbody2D rigidbody2D;
     float timer;
     int direction = 1;
     bool broken = true;
     
     Animator animator;
     
+    public RubyController RubyController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +26,17 @@ public class EnemyController : MonoBehaviour
         timer = changeTime;
         animator = GetComponent<Animator>();
         
+        GameObject rubycontrollerObject = GameObject.FindWithTag("RubyController");
+
+        if(rubycontrollerObject != null)
+        {
+            RubyController = rubycontrollerObject.GetComponent<RubyController>();
+            print ("Found the RubyController Sctript!");
+        }
+        if (RubyController == null)
+        {
+            print ("Cannot find GameController Script!");
+        }
     }
 
     void Update()
@@ -83,9 +96,13 @@ public class EnemyController : MonoBehaviour
     {
         broken = false;
         rigidbody2D.simulated = false;
-        //optional if you added the fixed animation
         animator.SetTrigger("Fixed");
-        
         smokeEffect.Stop();
+
+        if (RubyController != null)
+        {
+            RubyController.ChangeScore();
+        }
+
     }
 }
